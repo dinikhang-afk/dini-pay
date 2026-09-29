@@ -49,15 +49,72 @@ public final class InstalledAppsScanner: ObservableObject {
                 }
             }
 
-            // Fallback for non-jailbreak test environment
+            // Direct filesystem scan for TrollStore / Jailbreak rootless if runtime returned empty
             if results.isEmpty {
-                results = [
-                    InstalledAppInfo(bundleId: "com.spotify.client", appName: "Spotify", version: "8.9.20", isSystemApp: false, hasIAPSupport: true, containerPath: nil),
-                    InstalledAppInfo(bundleId: "com.duolingo.DuolingoMobile", appName: "Duolingo", version: "7.15.0", isSystemApp: false, hasIAPSupport: true, containerPath: nil),
-                    InstalledAppInfo(bundleId: "com.apple.mobilesafari", appName: "Safari", version: "18.0", isSystemApp: true, hasIAPSupport: false, containerPath: nil),
-                    InstalledAppInfo(bundleId: "com.tinder.Tinder", appName: "Tinder", version: "15.4.1", isSystemApp: false, hasIAPSupport: true, containerPath: nil),
-                    InstalledAppInfo(bundleId: "com.netflix.Netflix", appName: "Netflix", version: "16.8.0", isSystemApp: false, hasIAPSupport: true, containerPath: nil)
-                ].filter { includeSystem || !$0.isSystemApp }
+                let fileManager = FileManager.default
+                let bundleContainer = "/var/containers/Bundle/Application"
+                if fileManager.fileExists(atPath: bundleContainer),
+                   let folders = try? fileManager.contentsOfDirectory(atPath: bundleContainer) {
+                    for folder in folders {
+                        let folderPath = (bundleContainer as NSString).appendingPathComponent(folder)
+                        if let subItems = try? fileManager.contentsOfDirectory(atPath: folderPath) {
+                            for subItem in subItems where subItem.hasSuffix(".app") {
+                                let appPath = (folderPath as NSString).appendingPathComponent(subItem)
+                                let plistPath = (appPath as NSString).appendingPathComponent("Info.plist")
+                                if let dict = NSDictionary(contentsOfFile: plistPath) {
+                                    let bundleId = (dict["CFBundleIdentifier"] as? String) ?? ""
+                                    guard !bundleId.isEmpty else { continue }
+                                    let appName = (dict["CFBundleDisplayName"] as? String)
+                                        ?? (dict["CFBundleName"] as? String)
+                                        ?? subItem.replacingOccurrences(of: ".app", with: "")
+                                    let version = (dict["CFBundleShortVersionString"] as? String) ?? "1.0"
+
+                                    results.append(
+                                        InstalledAppInfo(
+                                            bundleId: bundleId,
+                                            appName: appName,
+                                            version: version,
+                                            isSystemApp: false,
+                                            hasIAPSupport: true,
+                                            containerPath: appPath
+                                        )
+                                    )
+                                }
+                            }
+                        }
+                    }
+                }
+
+                if includeSystem {
+                    let systemPaths = ["/Applications", "/var/jb/Applications"]
+                    for sysDir in systemPaths {
+                        guard fileManager.fileExists(atPath: sysDir),
+                              let subItems = try? fileManager.contentsOfDirectory(atPath: sysDir) else { continue }
+                        for subItem in subItems where subItem.hasSuffix(".app") {
+                            let appPath = (sysDir as NSString).appendingPathComponent(subItem)
+                            let plistPath = (appPath as NSString).appendingPathComponent("Info.plist")
+                            if let dict = NSDictionary(contentsOfFile: plistPath) {
+                                let bundleId = (dict["CFBundleIdentifier"] as? String) ?? ""
+                                guard !bundleId.isEmpty else { continue }
+                                let appName = (dict["CFBundleDisplayName"] as? String)
+                                    ?? (dict["CFBundleName"] as? String)
+                                    ?? subItem.replacingOccurrences(of: ".app", with: "")
+                                let version = (dict["CFBundleShortVersionString"] as? String) ?? "1.0"
+
+                                results.append(
+                                    InstalledAppInfo(
+                                        bundleId: bundleId,
+                                        appName: appName,
+                                        version: version,
+                                        isSystemApp: true,
+                                        hasIAPSupport: false,
+                                        containerPath: appPath
+                                    )
+                                )
+                            }
+                        }
+                    }
+                }
             }
 
             results.sort { $0.appName.localizedCaseInsensitiveCompare($1.appName) == .orderedAscending }

@@ -26,66 +26,87 @@ public struct ExploreStoreView: View {
                         }
                         .padding(.top, 8)
 
-                        // Banner Card
-                        VStack(alignment: .leading, spacing: 8) {
-                            HStack {
-                                Text("HOT TRIAL")
-                                    .font(.system(size: 10, weight: .bold))
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 8)
-                                    .padding(.vertical, 4)
-                                    .background(Color.iappayGreen)
-                                    .cornerRadius(6)
+                        if let topTrial = featuredTrials.first {
+                            // Dynamic Banner Card for top discovered trial
+                            VStack(alignment: .leading, spacing: 8) {
+                                HStack {
+                                    Text("HOT TRIAL")
+                                        .font(.system(size: 10, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 8)
+                                        .padding(.vertical, 4)
+                                        .background(Color.iappayGreen)
+                                        .cornerRadius(6)
 
-                                Spacer()
+                                    Spacer()
 
-                                Text("Miễn phí 30 ngày")
-                                    .font(.system(size: 12, weight: .bold))
-                                    .foregroundColor(.iappayYellow)
-                            }
-
-                            Text("YouTube Premium Lite")
-                                .font(.system(size: 20, weight: .heavy))
-                                .foregroundColor(.white)
-
-                            Text("Không quảng cáo trên hầu hết video, trải nghiệm nhẹ nhàng và tiết kiệm chi phí.")
-                                .font(.system(size: 12))
-                                .foregroundColor(.iappayTextSecondary)
-
-                            Button(action: {
-                                if let yt = store.items.first(where: { $0.id.contains("premium_lite_trial") }) {
-                                    selectedItem = yt
+                                    if let badge = topTrial.trialBadge {
+                                        Text(badge)
+                                            .font(.system(size: 12, weight: .bold))
+                                            .foregroundColor(.iappayYellow)
+                                    }
                                 }
-                            }) {
-                                Text("Kích Hoạt Ngay")
-                                    .font(.system(size: 13, weight: .bold))
+
+                                Text(topTrial.title)
+                                    .font(.system(size: 20, weight: .heavy))
                                     .foregroundColor(.white)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 8)
-                                    .background(Color.iappayPurple)
-                                    .cornerRadius(8)
+
+                                Text(topTrial.subtitle)
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.iappayTextSecondary)
+
+                                Button(action: {
+                                    selectedItem = topTrial
+                                }) {
+                                    Text("Kích Hoạt Ngay")
+                                        .font(.system(size: 13, weight: .bold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 16)
+                                        .padding(.vertical, 8)
+                                        .background(Color.iappayPurple)
+                                        .cornerRadius(8)
+                                }
+                                .padding(.top, 4)
                             }
-                            .padding(.top, 4)
-                        }
-                        .padding(16)
-                        .background(
-                            LinearGradient(
-                                colors: [Color(hex: 0x2A1B4E), Color.iappayCard],
-                                startPoint: .topLeading,
-                                endPoint: .bottomTrailing
+                            .padding(16)
+                            .background(
+                                LinearGradient(
+                                    colors: [Color(hex: 0x2A1B4E), Color.iappayCard],
+                                    startPoint: .topLeading,
+                                    endPoint: .bottomTrailing
+                                )
                             )
-                        )
-                        .cornerRadius(16)
-                        .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.iappayPurple.opacity(0.4), lineWidth: 1))
+                            .cornerRadius(16)
+                            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.iappayPurple.opacity(0.4), lineWidth: 1))
+                        }
 
-                        // Featured Free Trials
-                        Text("GÓI DÙNG THỬ NỔI BẬT")
-                            .font(.system(size: 12, weight: .bold))
-                            .foregroundColor(.iappayTextMuted)
+                        // Featured Free Trials or Empty State
+                        if featuredTrials.isEmpty {
+                            VStack(spacing: 12) {
+                                Image(systemName: "sparkles")
+                                    .font(.system(size: 40))
+                                    .foregroundColor(.iappayTextMuted)
+                                    .padding(.top, 20)
+                                Text("Chưa có gói dùng thử")
+                                    .font(.system(size: 16, weight: .bold))
+                                    .foregroundColor(.iappayTextPrimary)
+                                Text("Mở các ứng dụng trên thiết bị (có cài tweak IAPCheck) để thu thập các gói IAP thật.")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.iappayTextSecondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 24)
+                            }
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 30)
+                        } else {
+                            Text("GÓI DÙNG THỬ NỔI BẬT")
+                                .font(.system(size: 12, weight: .bold))
+                                .foregroundColor(.iappayTextMuted)
 
-                        ForEach(featuredTrials) { item in
-                            IAPItemRow(item: item) {
-                                selectedItem = item
+                            ForEach(featuredTrials) { item in
+                                IAPItemRow(item: item) {
+                                    selectedItem = item
+                                }
                             }
                         }
                     }

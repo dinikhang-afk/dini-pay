@@ -165,49 +165,68 @@ public struct InstalledView: View {
                                 }
                                 .padding(.top, 4)
 
-                                ForEach(scanner.installedApps) { app in
-                                    Button(action: {
-                                        scanner.launchApp(bundleId: app.bundleId)
-                                    }) {
-                                        HStack(spacing: 12) {
-                                            ZStack {
-                                                RoundedRectangle(cornerRadius: 10)
-                                                    .fill(Color.iappayPurple.opacity(0.3))
-                                                    .frame(width: 44, height: 44)
-                                                Image(systemName: "app.fill")
-                                                    .foregroundColor(.iappayPurple)
-                                            }
-
-                                            VStack(alignment: .leading, spacing: 3) {
-                                                Text(app.appName)
-                                                    .font(.system(size: 15, weight: .bold))
-                                                    .foregroundColor(.iappayTextPrimary)
-                                                Text(app.bundleId)
-                                                    .font(.system(size: 11))
-                                                    .foregroundColor(.iappayTextSecondary)
-                                                    .lineLimit(1)
-                                            }
-
-                                            Spacer()
-
-                                            HStack(spacing: 4) {
-                                                Text("Mở app")
-                                                    .font(.system(size: 12, weight: .bold))
-                                                Image(systemName: "arrow.up.right.square")
-                                                    .font(.system(size: 11))
-                                            }
-                                            .foregroundColor(.white)
-                                            .padding(.horizontal, 10)
-                                            .padding(.vertical, 6)
-                                            .background(Color.iappayPurple)
-                                            .cornerRadius(12)
-                                        }
-                                        .padding(12)
-                                        .background(Color.iappayCard)
-                                        .cornerRadius(14)
-                                        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.iappayBorder, lineWidth: 1))
+                                if scanner.installedApps.isEmpty {
+                                    VStack(spacing: 12) {
+                                        Image(systemName: "app.badge.checkmark")
+                                            .font(.system(size: 36))
+                                            .foregroundColor(.iappayTextMuted)
+                                            .padding(.top, 16)
+                                        Text("Chưa phát hiện ứng dụng")
+                                            .font(.system(size: 15, weight: .bold))
+                                            .foregroundColor(.iappayTextPrimary)
+                                        Text("Hãy đảm bảo app chạy trên TrollStore / Jailbreak hoặc nhấn nút làm mới để quét lại danh sách ứng dụng trên máy.")
+                                            .font(.system(size: 12))
+                                            .foregroundColor(.iappayTextSecondary)
+                                            .multilineTextAlignment(.center)
+                                            .padding(.horizontal, 24)
                                     }
-                                    .buttonStyle(PlainButtonStyle())
+                                    .frame(maxWidth: .infinity)
+                                    .padding(.vertical, 24)
+                                } else {
+                                    ForEach(scanner.installedApps) { app in
+                                        Button(action: {
+                                            scanner.launchApp(bundleId: app.bundleId)
+                                        }) {
+                                            HStack(spacing: 12) {
+                                                ZStack {
+                                                    RoundedRectangle(cornerRadius: 10)
+                                                        .fill(Color.iappayPurple.opacity(0.3))
+                                                        .frame(width: 44, height: 44)
+                                                    Image(systemName: "app.fill")
+                                                        .foregroundColor(.iappayPurple)
+                                                }
+
+                                                VStack(alignment: .leading, spacing: 3) {
+                                                    Text(app.appName)
+                                                        .font(.system(size: 15, weight: .bold))
+                                                        .foregroundColor(.iappayTextPrimary)
+                                                    Text(app.bundleId)
+                                                        .font(.system(size: 11))
+                                                        .foregroundColor(.iappayTextSecondary)
+                                                        .lineLimit(1)
+                                                }
+
+                                                Spacer()
+
+                                                HStack(spacing: 4) {
+                                                    Text("Mở app")
+                                                        .font(.system(size: 12, weight: .bold))
+                                                    Image(systemName: "arrow.up.right.square")
+                                                        .font(.system(size: 11))
+                                                }
+                                                .foregroundColor(.white)
+                                                .padding(.horizontal, 10)
+                                                .padding(.vertical, 6)
+                                                .background(Color.iappayPurple)
+                                                .cornerRadius(12)
+                                            }
+                                            .padding(12)
+                                            .background(Color.iappayCard)
+                                            .cornerRadius(14)
+                                            .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.iappayBorder, lineWidth: 1))
+                                        }
+                                        .buttonStyle(PlainButtonStyle())
+                                    }
                                 }
                             }
                         } else {

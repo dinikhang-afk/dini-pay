@@ -14,3 +14,7 @@
 .cxx
 local.properties
 app/build
+ios-app/output
+ios-app/build
+ios-tweak/packages
+ios-tweak/.theos
