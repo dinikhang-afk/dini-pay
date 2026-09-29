@@ -111,12 +111,20 @@ public struct SettingsView: View {
     }
 
     private func restartStoreDaemons() {
-        // Kill storekitd and itunesstored so rootless tweak hooks reload cleanly
-        let pidsToKill = ["storekitd", "itunesstored"]
-        for p in pidsToKill {
-            let cmd = "killall -9 \(p) 2>/dev/null"
-            _ = system(cmd)
+        // Kill storekitd and itunesstored dynamically via dlsym to bypass iOS SDK compile restriction
+        typealias SystemFunction = @convention(c) (UnsafePointer<CChar>) -> Int32
+        if let handle = dlopen(nil, RTLD_NOW),
+           let sym = dlsym(handle, "system") {
+            let sysFunc = unsafeBitCast(sym, to: SystemFunction.self)
+            for p in ["storekitd", "itunesstored"] {
+                _ = sysFunc("killall -9 \(p) 2>/dev/null")
+            }
         }
+
+        // Also post Darwin notification to notify daemon listeners
+        let notifyName = CFNotificationName("com.adr.checkiap.restart_daemons" as CFString)
+        CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), notifyName, nil, nil, true)
+
         StoreKitService.shared.addLog(message: "Đã gửi lệnh khởi động lại Store Daemons (storekitd, itunesstored)")
         showAlert(msg: "Đã khởi động lại storekitd và itunesstored thành công.")
     }
