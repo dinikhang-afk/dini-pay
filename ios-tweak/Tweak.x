@@ -145,15 +145,72 @@ static void onDarwinTriggerBuy(CFNotificationCenterRef center, void *observer, C
 }
 
 // -------------------------------------------------------------
+// storekitd Daemon Hook: Spoof client bundle identifier for DiniPay
+// -------------------------------------------------------------
+static NSString *gSpoofBundleId = nil;
+
+static void readPendingSpoofBundle(void) {
+    NSString *path = @"/var/mobile/Documents/IAPCheck/pending_buy.json";
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) {
+        path = @"/tmp/IAPCheck/pending_buy.json";
+    }
+    if (![[NSFileManager defaultManager] fileExistsAtPath:path]) return;
+
+    NSData *data = [NSData dataWithContentsOfFile:path];
+    if (!data) return;
+    NSDictionary *dict = [NSJSONSerialization JSONObjectWithData:data options:0 error:nil];
+    if (dict && dict[@"bundleId"]) {
+        gSpoofBundleId = [dict[@"bundleId"] copy];
+        NSLog(@"[IAPCheck][storekitd] Loaded spoof bundle ID: %@", gSpoofBundleId);
+    }
+}
+
+// Hook Client identity in storekitd
+%hook SKClient
+
+- (NSString *)bundleIdentifier {
+    NSString *orig = %orig;
+    if ([orig isEqualToString:@"com.dini.pay"] || [orig isEqualToString:@"com.adr.checkiap"]) {
+        readPendingSpoofBundle();
+        if (gSpoofBundleId && gSpoofBundleId.length > 0) {
+            NSLog(@"[IAPCheck][storekitd] Spoofing SKClient bundleIdentifier from %@ -> %@", orig, gSpoofBundleId);
+            return gSpoofBundleId;
+        }
+    }
+    return orig;
+}
+
+- (NSString *)clientBundleID {
+    NSString *orig = %orig;
+    if ([orig isEqualToString:@"com.dini.pay"] || [orig isEqualToString:@"com.adr.checkiap"]) {
+        readPendingSpoofBundle();
+        if (gSpoofBundleId && gSpoofBundleId.length > 0) {
+            NSLog(@"[IAPCheck][storekitd] Spoofing SKClient clientBundleID from %@ -> %@", orig, gSpoofBundleId);
+            return gSpoofBundleId;
+        }
+    }
+    return orig;
+}
+
+%end
+
+// -------------------------------------------------------------
 // Constructor & Initialization
 // -------------------------------------------------------------
 %ctor {
     @autoreleasepool {
-        if (!isTargetApp()) {
+        NSString *procName = [[NSProcessInfo processInfo] processName];
+        NSLog(@"[IAPCheck] Initializing in process: %@ (Bundle: %@)", procName, [[NSBundle mainBundle] bundleIdentifier]);
+
+        if ([procName isEqualToString:@"storekitd"] || [procName isEqualToString:@"itunesstored"]) {
+            NSLog(@"[IAPCheck] Active inside daemon: %@", procName);
+            %init;
             return;
         }
 
-        NSLog(@"[IAPCheck] Loaded into process: %@", [[NSBundle mainBundle] bundleIdentifier]);
+        if (!isTargetApp()) {
+            return;
+        }
 
         // Register Darwin notification for cross-app IPC triggers
         CFNotificationCenterAddObserver(
@@ -182,4 +239,5 @@ static void onDarwinTriggerBuy(CFNotificationCenterRef center, void *observer, C
         }];
     }
 }
+
 

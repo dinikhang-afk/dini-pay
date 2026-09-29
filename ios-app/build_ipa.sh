@@ -28,6 +28,7 @@ if [ -n "$SDK_PATH" ]; then
         -framework SwiftUI \
         -framework Foundation \
         -framework CoreServices \
+        -framework StoreKit \
         ${SWIFT_FILES} \
         -o "${APP_DIR}/${APP_NAME}"
 else

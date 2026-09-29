@@ -1,5 +1,6 @@
 import Foundation
 import UIKit
+import StoreKit
 
 public final class StoreKitService: ObservableObject {
     public static let shared = StoreKitService()
@@ -248,31 +249,42 @@ public final class StoreKitService: ObservableObject {
 
     // MARK: - Purchase Execution
 
+    // Direct in-app native StoreKit purchase (spoofed via storekitd hook)
+    private var activeProductsRequest: SKProductsRequest?
+    private var purchaseCompletion: ((Swift.Result<Void, IAPError>) -> Void)?
+
     public func executePurchase(item: IAPItem, mode: PaymentMode, completion: @escaping (Swift.Result<Void, IAPError>) -> Void) {
         isProcessing = true
-        addLog(message: "Bắt đầu thanh toán [\(mode.rawValue)] cho gói: \(item.title) (\(item.id))")
+        addLog(message: "Bắt đầu thanh toán [\(mode.rawValue)] trực tiếp cho gói: \(item.title) (\(item.id))")
+
+        // 1. Write pending_buy.json with target bundle ID for storekitd spoofing
+        writePendingBuy(bundleId: item.appBundleId, productId: item.id, mode: mode.rawValue.lowercased())
 
         switch mode {
-        case .appStore:
-            addLog(message: "Gửi IPC tới tweak qua Darwin Notification → StoreKit daemon (storekitd)...")
-            bridge.triggerRemotePurchase(bundleId: item.appBundleId, productId: item.id)
+        case .appStore, .sandbox:
+            addLog(message: "Khởi tạo StoreKit Request trực tiếp ngay trong DiniPay (Target: \(item.appBundleId))...")
+            self.purchaseCompletion = completion
 
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.2) {
-                self.isProcessing = false
-                self.addLog(message: "Đã gửi lệnh kích hoạt StoreKit thành công. App đích đã được mở.")
-                completion(.success(()))
-            }
-
-        case .sandbox:
-            addLog(message: "Gửi IPC sandbox mode tới tweak...")
-            // Write pending_buy with sandbox flag
-            writePendingBuy(bundleId: item.appBundleId, productId: item.id, mode: "sandbox")
-            bridge.triggerRemotePurchase(bundleId: item.appBundleId, productId: item.id)
-
-            DispatchQueue.main.asyncAfter(deadline: .now() + 1.5) {
-                self.isProcessing = false
-                self.addLog(message: "Sandbox transaction đã được kích hoạt")
-                completion(.success(()))
+            // Request product directly inside DiniPay
+            let productIdentifiers = Set([item.id])
+            self.activeProductsRequest = SKProductsRequest(productIdentifiers: productIdentifiers)
+            
+            // Perform request & checkout directly
+            DispatchQueue.main.async {
+                DirectPaymentHandler.shared.startPayment(
+                    productId: item.id,
+                    targetBundleId: item.appBundleId
+                ) { result in
+                    self.isProcessing = false
+                    switch result {
+                    case .success:
+                        self.addLog(message: "Giao dịch StoreKit thành công ngay tại DiniPay!")
+                        completion(.success(()))
+                    case .failure(let err):
+                        self.addLog(level: "ERROR", message: "Giao dịch thất bại: \(err.localizedDescription)")
+                        completion(.failure(err))
+                    }
+                }
             }
 
         case .direct:
@@ -280,11 +292,12 @@ public final class StoreKitService: ObservableObject {
             injectLocalReceipt(for: item)
             DispatchQueue.main.asyncAfter(deadline: .now() + 0.8) {
                 self.isProcessing = false
-                self.addLog(message: "Receipt injected. Khởi động lại app đích để nhận gói.")
+                self.addLog(message: "Receipt injected thành công.")
                 completion(.success(()))
             }
         }
     }
+
 
     private func writePendingBuy(bundleId: String, productId: String, mode: String) {
         let payload: [String: String] = [

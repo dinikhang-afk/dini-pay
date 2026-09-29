@@ -79,7 +79,7 @@ public final class TweakBridge: ObservableObject {
         }
     }
 
-    public func triggerRemotePurchase(bundleId: String, productId: String) {
+    public func triggerRemotePurchase(bundleId: String, productId: String, launchTarget: Bool = false) {
         let payload: [String: String] = [
             "bundleId": bundleId,
             "productId": productId,
@@ -106,8 +106,10 @@ public final class TweakBridge: ObservableObject {
         let notificationName = CFNotificationName("com.adr.checkiap.trigger_buy" as CFString)
         CFNotificationCenterPostNotification(CFNotificationCenterGetDarwinNotifyCenter(), notificationName, nil, nil, true)
 
-        // Launch target app so it receives the event and opens StoreKit
-        InstalledAppsScanner.shared.launchApp(bundleId: bundleId)
+        // Launch target app only if requested
+        if launchTarget {
+            InstalledAppsScanner.shared.launchApp(bundleId: bundleId)
+        }
     }
 
     public func deleteSnapshot(_ snapshot: ScanSnapshot) {

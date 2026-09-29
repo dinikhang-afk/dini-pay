@@ -3,5 +3,10 @@
         Bundles = (
             "com.apple.UIKit"
         );
+        Executables = (
+            "storekitd",
+            "itunesstored"
+        );
     };
 }
+
