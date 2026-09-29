@@ -2,6 +2,7 @@ import SwiftUI
 
 public struct InstalledView: View {
     @ObservedObject var store = StoreKitService.shared
+    @ObservedObject var scanner = InstalledAppsScanner.shared
     @State private var selectedFilter: String = "Tất cả"
     @State private var searchText: String = ""
     @State private var selectedItemForPurchase: IAPItem? = nil
@@ -43,13 +44,26 @@ public struct InstalledView: View {
 
                 ScrollView {
                     VStack(alignment: .leading, spacing: 16) {
-                        // Top Header: Title & Logs Button
+                        // Top Header: Title, Reload & Logs Button
                         HStack {
                             Text("Đã cài đặt")
                                 .font(.system(size: 22, weight: .bold))
                                 .foregroundColor(.iappayTextPrimary)
 
                             Spacer()
+
+                            Button(action: {
+                                store.loadRealData()
+                                scanner.scanApps()
+                            }) {
+                                Image(systemName: "arrow.clockwise")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.iappayPurple)
+                                    .padding(8)
+                                    .background(Color.iappayCard)
+                                    .clipShape(Circle())
+                                    .overlay(Circle().stroke(Color.iappayBorder, lineWidth: 1))
+                            }
 
                             Button(action: { showingLogs = true }) {
                                 HStack(spacing: 6) {
@@ -137,18 +151,79 @@ public struct InstalledView: View {
                         .cornerRadius(12)
                         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.iappayBorder, lineWidth: 1))
 
-                        // Grouped Items List
-                        ForEach(groupedItems.keys.sorted(), id: \.self) { groupKey in
-                            VStack(alignment: .leading, spacing: 10) {
-                                // Group Header
-                                Text(groupKey.uppercased())
-                                    .font(.system(size: 12, weight: .bold))
-                                    .foregroundColor(.iappayTextMuted)
-                                    .padding(.top, 8)
+                        if store.items.isEmpty {
+                            // Section: Installed Apps to launch and capture IAP
+                            VStack(alignment: .leading, spacing: 12) {
+                                HStack {
+                                    Text("ỨNG DỤNG TRÊN MÁY (\(scanner.installedApps.count))")
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundColor(.iappayTextMuted)
+                                    Spacer()
+                                    Text("Chạm để mở & bắt gói IAP")
+                                        .font(.system(size: 11))
+                                        .foregroundColor(.iappayGreen)
+                                }
+                                .padding(.top, 4)
 
-                                ForEach(groupedItems[groupKey] ?? []) { item in
-                                    IAPItemRow(item: item) {
-                                        selectedItemForPurchase = item
+                                ForEach(scanner.installedApps) { app in
+                                    Button(action: {
+                                        scanner.launchApp(bundleId: app.bundleId)
+                                    }) {
+                                        HStack(spacing: 12) {
+                                            ZStack {
+                                                RoundedRectangle(cornerRadius: 10)
+                                                    .fill(Color.iappayPurple.opacity(0.3))
+                                                    .frame(width: 44, height: 44)
+                                                Image(systemName: "app.fill")
+                                                    .foregroundColor(.iappayPurple)
+                                            }
+
+                                            VStack(alignment: .leading, spacing: 3) {
+                                                Text(app.appName)
+                                                    .font(.system(size: 15, weight: .bold))
+                                                    .foregroundColor(.iappayTextPrimary)
+                                                Text(app.bundleId)
+                                                    .font(.system(size: 11))
+                                                    .foregroundColor(.iappayTextSecondary)
+                                                    .lineLimit(1)
+                                            }
+
+                                            Spacer()
+
+                                            HStack(spacing: 4) {
+                                                Text("Mở app")
+                                                    .font(.system(size: 12, weight: .bold))
+                                                Image(systemName: "arrow.up.right.square")
+                                                    .font(.system(size: 11))
+                                            }
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 10)
+                                            .padding(.vertical, 6)
+                                            .background(Color.iappayPurple)
+                                            .cornerRadius(12)
+                                        }
+                                        .padding(12)
+                                        .background(Color.iappayCard)
+                                        .cornerRadius(14)
+                                        .overlay(RoundedRectangle(cornerRadius: 14).stroke(Color.iappayBorder, lineWidth: 1))
+                                    }
+                                    .buttonStyle(PlainButtonStyle())
+                                }
+                            }
+                        } else {
+                            // Grouped Items List
+                            ForEach(groupedItems.keys.sorted(), id: \.self) { groupKey in
+                                VStack(alignment: .leading, spacing: 10) {
+                                    // Group Header
+                                    Text(groupKey.uppercased())
+                                        .font(.system(size: 12, weight: .bold))
+                                        .foregroundColor(.iappayTextMuted)
+                                        .padding(.top, 8)
+
+                                    ForEach(groupedItems[groupKey] ?? []) { item in
+                                        IAPItemRow(item: item) {
+                                            selectedItemForPurchase = item
+                                        }
                                     }
                                 }
                             }
@@ -167,6 +242,9 @@ public struct InstalledView: View {
             }
             .sheet(isPresented: $showingLogs) {
                 LogsView()
+            }
+            .onAppear {
+                scanner.scanApps()
             }
         }
     }

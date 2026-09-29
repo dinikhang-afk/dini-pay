@@ -28,10 +28,20 @@ jobs:
           chmod +x build_ipa.sh
           ./build_ipa.sh
 
-      - name: Upload IPA Artifact
+      - name: Install Theos & Build Tweak DEB
+        run: |
+          git clone --recursive https://github.com/theos/theos.git ~/theos
+          export THEOS=~/theos
+          cd ios-tweak
+          make package FINALPACKAGE=1 THEOS_PACKAGE_SCHEME=rootless
+          mkdir -p ../ios-app/output
+          cp packages/*.deb ../ios-app/output/ || true
+
+      - name: Upload Artifacts (IPA, TIPA, DEB)
         uses: actions/upload-artifact@v4
         with:
-          name: DiniPay-IPA
+          name: DiniPay-Package
           path: |
             ios-app/output/DiniPay.ipa
             ios-app/output/DiniPay.tipa
+            ios-app/output/*.deb

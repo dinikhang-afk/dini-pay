@@ -278,13 +278,32 @@ static NSString *formatPrice(NSDecimalNumber *price, NSLocale *locale) {
 
 - (NSString *)saveToDisk {
     NSString *json = [self exportJSONString];
-    NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
-    NSString *folder = [docPath stringByAppendingPathComponent:@"IAPCheck"];
-    [[NSFileManager defaultManager] createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:nil];
+    NSArray *targetFolders = @[
+        @"/var/mobile/Documents/IAPCheck",
+        @"/var/jb/var/mobile/Documents/IAPCheck",
+        @"/tmp/IAPCheck"
+    ];
 
-    NSString *filePath = [folder stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_iap.json", self.bundleId]];
-    [json writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:nil];
-    return filePath;
+    NSFileManager *fm = [NSFileManager defaultManager];
+    NSString *lastPath = nil;
+
+    for (NSString *folder in targetFolders) {
+        [fm createDirectoryAtPath:folder withIntermediateDirectories:YES attributes:nil error:nil];
+        NSString *filePath = [folder stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_iap.json", self.bundleId]];
+        if ([json writeToFile:filePath atomically:YES encoding:NSUTF8StringEncoding error:nil]) {
+            lastPath = filePath;
+        }
+    }
+
+    NSString *docPath = [NSSearchPathForDirectoriesInDomains(NSDocumentDirectory, NSUserDomainMask, YES) firstObject];
+    if (docPath) {
+        NSString *localFolder = [docPath stringByAppendingPathComponent:@"IAPCheck"];
+        [fm createDirectoryAtPath:localFolder withIntermediateDirectories:YES attributes:nil error:nil];
+        NSString *localFile = [localFolder stringByAppendingPathComponent:[NSString stringWithFormat:@"%@_iap.json", self.bundleId]];
+        [json writeToFile:localFile atomically:YES encoding:NSUTF8StringEncoding error:nil];
+        if (!lastPath) lastPath = localFile;
+    }
+    return lastPath;
 }
 
 @end
