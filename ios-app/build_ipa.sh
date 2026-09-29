@@ -42,6 +42,11 @@ fi
 
 echo "=== [3/4] Copy Info.plist & Assets ==="
 cp Info.plist "${APP_DIR}/Info.plist"
+if [ -f "AppIcon.png" ]; then
+    cp AppIcon.png "${APP_DIR}/AppIcon.png"
+    cp AppIcon.png "${APP_DIR}/AppIcon60x60@2x.png" 2>/dev/null || true
+    cp AppIcon.png "${APP_DIR}/AppIcon60x60@3x.png" 2>/dev/null || true
+fi
 
 # Fake codesign with ldid if available
 if command -v ldid &> /dev/null; then
