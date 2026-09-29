@@ -118,32 +118,6 @@ public final class InstalledAppsScanner: ObservableObject {
                 }
             }
 
-            // 4. Fallback default apps if completely sandboxed (prevents 0 apps state)
-            if results.isEmpty {
-                let popularApps: [(name: String, bundleId: String)] = [
-                    ("CapCut", "com.lemon.lvoverseas"),
-                    ("Adobe Lightroom", "com.adobe.lightroom"),
-                    ("Picsart AI", "com.picsart.studio"),
-                    ("VSCO: Photo & Video", "com.visualsupply.vsco"),
-                    ("Canva: Design", "com.canva.canva"),
-                    ("Duolingo", "com.duolingo.DuolingoMobile"),
-                    ("YouTube", "com.google.ios.youtube"),
-                    ("Spotify: Music and Podcasts", "com.spotify.client")
-                ]
-                for p in popularApps {
-                    results.append(
-                        InstalledAppInfo(
-                            bundleId: p.bundleId,
-                            appName: p.name,
-                            version: "App Store",
-                            isSystemApp: false,
-                            hasIAPSupport: true,
-                            containerPath: nil
-                        )
-                    )
-                }
-            }
-
             results.sort { $0.appName.localizedCaseInsensitiveCompare($1.appName) == .orderedAscending }
 
             DispatchQueue.main.async {

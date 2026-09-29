@@ -336,15 +336,6 @@ struct AddCustomAppSheet: View {
     @State private var bundleId: String = ""
     @State private var appName: String = ""
 
-    private let suggestions = [
-        ("CapCut", "com.lemon.lvoverseas"),
-        ("Lightroom", "com.adobe.lightroom"),
-        ("VSCO", "com.visualsupply.vsco"),
-        ("Canva", "com.canva.canva"),
-        ("Picsart", "com.picsart.studio"),
-        ("Duolingo", "com.duolingo.DuolingoMobile")
-    ]
-
     var body: some View {
         ZStack {
             Color.iappayBackground.edgesIgnoringSafeArea(.all)
@@ -389,32 +380,6 @@ struct AddCustomAppSheet: View {
                         .background(Color.iappayCard)
                         .cornerRadius(12)
                         .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.iappayBorder, lineWidth: 1))
-                }
-
-                VStack(alignment: .leading, spacing: 8) {
-                    Text("GỢI Ý ỨNG DỤNG PHỔ BIẾN:")
-                        .font(.system(size: 11, weight: .bold))
-                        .foregroundColor(.iappayTextMuted)
-
-                    ScrollView(.horizontal, showsIndicators: false) {
-                        HStack(spacing: 8) {
-                            ForEach(suggestions, id: \.1) { item in
-                                Button(action: {
-                                    appName = item.0
-                                    bundleId = item.1
-                                }) {
-                                    Text(item.0)
-                                        .font(.system(size: 12, weight: .semibold))
-                                        .foregroundColor(.white)
-                                        .padding(.horizontal, 12)
-                                        .padding(.vertical, 6)
-                                        .background(Color.iappayCard)
-                                        .cornerRadius(12)
-                                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.iappayBorder, lineWidth: 1))
-                                }
-                            }
-                        }
-                    }
                 }
 
                 Spacer()
