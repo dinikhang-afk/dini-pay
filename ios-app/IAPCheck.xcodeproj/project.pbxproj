@@ -1,0 +1,272 @@
+// !$*UTF8*$!
+{
+	archiveVersion = 1;
+	classes = {
+	};
+	objectVersion = 56;
+	objects = {
+
+/* Begin PBXBuildFile section */
+		A10001 /* IAPCheckApp.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10001 /* IAPCheckApp.swift */; };
+		A10002 /* Theme.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10002 /* Theme.swift */; };
+		A10003 /* Models.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10003 /* Models.swift */; };
+		A10004 /* DiffEngine.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10004 /* DiffEngine.swift */; };
+		A10005 /* InstalledAppsScanner.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10005 /* InstalledAppsScanner.swift */; };
+		A10006 /* TweakBridge.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10006 /* TweakBridge.swift */; };
+		A10007 /* CommonViews.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10007 /* CommonViews.swift */; };
+		A10008 /* DashboardView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10008 /* DashboardView.swift */; };
+		A10009 /* InstalledAppsView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10009 /* InstalledAppsView.swift */; };
+		A10010 /* ProductDetailView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10010 /* ProductDetailView.swift */; };
+		A10011 /* DiffView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10011 /* DiffView.swift */; };
+		A10012 /* HistoryView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10012 /* HistoryView.swift */; };
+		A10013 /* MainTabView.swift in Sources */ = {isa = PBXBuildFile; fileRef = B10013 /* MainTabView.swift */; };
+/* End PBXBuildFile section */
+
+/* Begin PBXFileReference section */
+		C10001 /* IAPCheckApp.app */ = {isa = PBXFileReference; explicitFileType = wrapper.application; includeInIndex = 0; path = IAPCheckApp.app; sourceTree = BUILT_PRODUCTS_DIR; };
+		B10001 /* IAPCheckApp.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = IAPCheckApp.swift; sourceTree = "<group>"; };
+		B10002 /* Theme.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Theme.swift; sourceTree = "<group>"; };
+		B10003 /* Models.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = Models.swift; sourceTree = "<group>"; };
+		B10004 /* DiffEngine.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffEngine.swift; sourceTree = "<group>"; };
+		B10005 /* InstalledAppsScanner.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledAppsScanner.swift; sourceTree = "<group>"; };
+		B10006 /* TweakBridge.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TweakBridge.swift; sourceTree = "<group>"; };
+		B10007 /* CommonViews.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CommonViews.swift; sourceTree = "<group>"; };
+		B10008 /* DashboardView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DashboardView.swift; sourceTree = "<group>"; };
+		B10009 /* InstalledAppsView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = InstalledAppsView.swift; sourceTree = "<group>"; };
+		B10010 /* ProductDetailView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ProductDetailView.swift; sourceTree = "<group>"; };
+		B10011 /* DiffView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DiffView.swift; sourceTree = "<group>"; };
+		B10012 /* HistoryView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HistoryView.swift; sourceTree = "<group>"; };
+		B10013 /* MainTabView.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = MainTabView.swift; sourceTree = "<group>"; };
+		D10001 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		D10002 /* entitlements.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = entitlements.plist; sourceTree = "<group>"; };
+/* End PBXFileReference section */
+
+/* Begin PBXFrameworksBuildPhase section */
+		E10001 /* Frameworks */ = {
+			isa = PBXFrameworksBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXFrameworksBuildPhase section */
+
+/* Begin PBXGroup section */
+		F10001 = {
+			isa = PBXGroup;
+			children = (
+				F10002 /* Sources */,
+				D10001 /* Info.plist */,
+				D10002 /* entitlements.plist */,
+				F10003 /* Products */,
+			);
+			sourceTree = "<group>";
+		};
+		F10002 /* Sources */ = {
+			isa = PBXGroup;
+			children = (
+				B10001 /* IAPCheckApp.swift */,
+				B10002 /* Theme.swift */,
+				B10003 /* Models.swift */,
+				B10004 /* DiffEngine.swift */,
+				B10005 /* InstalledAppsScanner.swift */,
+				B10006 /* TweakBridge.swift */,
+				B10007 /* CommonViews.swift */,
+				B10008 /* DashboardView.swift */,
+				B10009 /* InstalledAppsView.swift */,
+				B10010 /* ProductDetailView.swift */,
+				B10011 /* DiffView.swift */,
+				B10012 /* HistoryView.swift */,
+				B10013 /* MainTabView.swift */,
+			);
+			name = Sources;
+			path = Sources;
+			sourceTree = "<group>";
+		};
+		F10003 /* Products */ = {
+			isa = PBXGroup;
+			children = (
+				C10001 /* IAPCheckApp.app */,
+			);
+			name = Products;
+			sourceTree = "<group>";
+		};
+/* End PBXGroup section */
+
+/* Begin PBXNativeTarget section */
+		T10001 /* IAPCheckApp */ = {
+			isa = PBXNativeTarget;
+			buildConfigurationList = L10002 /* Build configuration list for PBXNativeTarget "IAPCheckApp" */;
+			buildPhases = (
+				S10001 /* Sources */,
+				E10001 /* Frameworks */,
+			);
+			buildRules = (
+			);
+			dependencies = (
+			);
+			name = IAPCheckApp;
+			productName = IAPCheckApp;
+			productReference = C10001 /* IAPCheckApp.app */;
+			productType = "com.apple.product-type.application";
+		};
+/* End PBXNativeTarget section */
+
+/* Begin PBXProject section */
+		P10001 /* Project object */ = {
+			isa = PBXProject;
+			attributes = {
+				BuildIndependentTargetsInParallel = 1;
+				LastUpgradeCheck = 1500;
+			};
+			buildConfigurationList = L10001 /* Build configuration list for PBXProject "IAPCheck" */;
+			compatibilityVersion = "Xcode 14.0";
+			developmentRegion = en;
+			hasScannedForEncodings = 0;
+			knownRegions = (
+				en,
+				Base,
+			);
+			mainGroup = F10001;
+			productRefGroup = F10003 /* Products */;
+			projectDirPath = "";
+			projectRoot = "";
+			targets = (
+				T10001 /* IAPCheckApp */,
+			);
+		};
+/* End PBXProject section */
+
+/* Begin PBXSourcesBuildPhase section */
+		S10001 /* Sources */ = {
+			isa = PBXSourcesBuildPhase;
+			buildActionMask = 2147483647;
+			files = (
+				A10001 /* IAPCheckApp.swift in Sources */,
+				A10002 /* Theme.swift in Sources */,
+				A10003 /* Models.swift in Sources */,
+				A10004 /* DiffEngine.swift in Sources */,
+				A10005 /* InstalledAppsScanner.swift in Sources */,
+				A10006 /* TweakBridge.swift in Sources */,
+				A10007 /* CommonViews.swift in Sources */,
+				A10008 /* DashboardView.swift in Sources */,
+				A10009 /* InstalledAppsView.swift in Sources */,
+				A10010 /* ProductDetailView.swift in Sources */,
+				A10011 /* DiffView.swift in Sources */,
+				A10012 /* HistoryView.swift in Sources */,
+				A10013 /* MainTabView.swift in Sources */,
+			);
+			runOnlyForDeploymentPostprocessing = 0;
+		};
+/* End PBXSourcesBuildPhase section */
+
+/* Begin XCBuildConfiguration section */
+		C10002 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				ENABLE_TESTABILITY = YES;
+				GCC_DYNAMIC_NO_PIC = NO;
+				GCC_OPTIMIZATION_LEVEL = 0;
+				GCC_PREPROCESSOR_DEFINITIONS = (
+					"DEBUG=1",
+					"$(inherited)",
+				);
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				ONLY_ACTIVE_ARCH = YES;
+				SDKROOT = iphoneos;
+				SWIFT_ACTIVE_COMPILATION_CONDITIONS = DEBUG;
+				SWIFT_OPTIMIZATION_LEVEL = "-Onone";
+				SWIFT_VERSION = 5.0;
+			};
+			name = Debug;
+		};
+		C10003 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ALWAYS_SEARCH_USER_PATHS = NO;
+				CLANG_ANALYZER_NONNULL = YES;
+				CLANG_ENABLE_MODULES = YES;
+				COPY_PHASE_STRIP = NO;
+				ENABLE_STRICT_OBJC_MSGSEND = YES;
+				IPHONEOS_DEPLOYMENT_TARGET = 16.0;
+				SDKROOT = iphoneos;
+				SWIFT_COMPILATION_MODE = wholemodule;
+				SWIFT_OPTIMIZATION_LEVEL = "-O";
+				SWIFT_VERSION = 5.0;
+				VALIDATE_PRODUCT = YES;
+			};
+			name = Release;
+		};
+		C10004 /* Debug */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = entitlements.plist;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.adr.checkiap.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Debug;
+		};
+		C10005 /* Release */ = {
+			isa = XCBuildConfiguration;
+			buildSettings = {
+				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
+				CODE_SIGN_ENTITLEMENTS = entitlements.plist;
+				CODE_SIGN_STYLE = Automatic;
+				CURRENT_PROJECT_VERSION = 1;
+				GENERATE_INFOPLIST_FILE = NO;
+				INFOPLIST_FILE = Info.plist;
+				LD_RUNPATH_SEARCH_PATHS = (
+					"$(inherited)",
+					"@executable_path/Frameworks",
+				);
+				MARKETING_VERSION = 1.0.0;
+				PRODUCT_BUNDLE_IDENTIFIER = com.adr.checkiap.app;
+				PRODUCT_NAME = "$(TARGET_NAME)";
+				SWIFT_VERSION = 5.0;
+				TARGETED_DEVICE_FAMILY = "1,2";
+			};
+			name = Release;
+		};
+/* End XCBuildConfiguration section */
+
+/* Begin XCConfigurationList section */
+		L10001 /* Build configuration list for PBXProject "IAPCheck" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C10002 /* Debug */,
+				C10003 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+		L10002 /* Build configuration list for PBXNativeTarget "IAPCheckApp" */ = {
+			isa = XCConfigurationList;
+			buildConfigurations = (
+				C10004 /* Debug */,
+				C10005 /* Release */,
+			);
+			defaultConfigurationIsVisible = 0;
+			defaultConfigurationName = Release;
+		};
+/* End XCConfigurationList section */
+
+	};
+	rootObject = P10001 /* Project object */;
+}

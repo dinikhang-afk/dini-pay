@@ -1,0 +1,2 @@
+com.adr.checkiap.xposed.IapHookModule
+com.adr.checkiap.xposed.ActivityHookModule

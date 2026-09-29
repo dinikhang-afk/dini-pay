@@ -1,0 +1,4 @@
+<resources>
+    <string name="app_name">ADR Check IAP</string>
+    <string name="accessibility_service_desc">Hỗ trợ tự động tìm và click nút Mua / Dùng thử 0đ bên trong app mục tiêu để mở Google Play Billing mà không cần Root hay LSPatch.</string>
+</resources>

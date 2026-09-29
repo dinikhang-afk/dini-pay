@@ -1,0 +1,13 @@
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="108dp"
+    android:height="108dp"
+    android:viewportWidth="108"
+    android:viewportHeight="108">
+    <!-- Shield/Check icon for IAP checker -->
+    <path
+        android:fillColor="#58A6FF"
+        android:pathData="M54,24L30,36v18c0,16.6 10.2,32.1 24,36 13.8,-3.9 24,-19.4 24,-36V36L54,24z"/>
+    <path
+        android:fillColor="#0D1117"
+        android:pathData="M46,58l-8,-8 3,-3 5,5 13,-13 3,3z"/>
+</vector>
