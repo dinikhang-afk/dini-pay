@@ -5,8 +5,10 @@ public struct InstalledView: View {
     @ObservedObject var scanner = InstalledAppsScanner.shared
     @State private var selectedFilter: String = "Tất cả"
     @State private var searchText: String = ""
-    @State private var selectedItemForPurchase: IAPItem? = nil
     @State private var showingLogs: Bool = false
+    @State private var selectedItemForPurchase: IAPItem? = nil
+    @State private var selectedAppForDetail: InstalledAppInfo? = nil
+    @State private var selectedItemForSpec: IAPItem? = nil
 
     var allCount: Int { store.items.count }
     var trialCount: Int { store.items.filter { $0.isTrial }.count }
@@ -185,7 +187,7 @@ public struct InstalledView: View {
                                 } else {
                                     ForEach(scanner.installedApps) { app in
                                         Button(action: {
-                                            scanner.launchApp(bundleId: app.bundleId)
+                                            selectedAppForDetail = app
                                         }) {
                                             HStack(spacing: 12) {
                                                 ZStack {
@@ -209,9 +211,9 @@ public struct InstalledView: View {
                                                 Spacer()
 
                                                 HStack(spacing: 4) {
-                                                    Text("Mở app")
+                                                    Text("Xem gói")
                                                         .font(.system(size: 12, weight: .bold))
-                                                    Image(systemName: "arrow.up.right.square")
+                                                    Image(systemName: "chevron.right")
                                                         .font(.system(size: 11))
                                                 }
                                                 .foregroundColor(.white)
@@ -241,7 +243,7 @@ public struct InstalledView: View {
 
                                     ForEach(groupedItems[groupKey] ?? []) { item in
                                         IAPItemRow(item: item) {
-                                            selectedItemForPurchase = item
+                                            selectedItemForSpec = item
                                         }
                                     }
                                 }
@@ -253,6 +255,22 @@ public struct InstalledView: View {
                 }
             }
             .navigationBarHidden(true)
+            .sheet(item: $selectedAppForDetail) { app in
+                AppIAPDetailView(
+                    appName: app.appName,
+                    bundleId: app.bundleId,
+                    appIconSystem: "app.fill",
+                    initialItems: store.items.filter { $0.appBundleId == app.bundleId }
+                )
+            }
+            .sheet(item: $selectedItemForSpec) { item in
+                IAPSpecSheet(item: item, isPresented: Binding(
+                    get: { selectedItemForSpec != nil },
+                    set: { if !$0 { selectedItemForSpec = nil } }
+                ), onBuyTapped: {
+                    selectedItemForPurchase = item
+                })
+            }
             .sheet(item: $selectedItemForPurchase) { item in
                 PurchaseConfirmSheet(item: item, isPresented: Binding(
                     get: { selectedItemForPurchase != nil },

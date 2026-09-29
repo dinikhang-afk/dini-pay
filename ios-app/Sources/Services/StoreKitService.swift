@@ -169,9 +169,18 @@ public final class StoreKitService: ObservableObject {
             let appName = cachedAppNames[bundleId] ?? bundleId.split(separator: ".").last.map(String.init) ?? bundleId
             let groupCount = products.count
             let groupName = "\(appName.uppercased()) • \(groupCount) gói"
-
-            // System image for app icon
             let iconName = guessSystemIcon(bundleId: bundleId, productType: productType)
+
+            var detectedOfferId: String? = nil
+            for offer in offers {
+                if let oId = offer["offerId"] as? String, !oId.isEmpty {
+                    detectedOfferId = oId
+                    break
+                }
+            }
+
+            let rawPriceDouble = Double(formattedBasePrice.filter { "0123456789.".contains($0) }) ?? 0.0
+            let familyName = title.components(separatedBy: " ").first ?? "Pro"
 
             result.append(IAPItem(
                 id: productId,
@@ -180,13 +189,18 @@ public final class StoreKitService: ObservableObject {
                 appIconSystem: iconName,
                 title: title,
                 formattedPrice: isFree ? "Miễn phí" : formattedBasePrice,
+                rawPrice: rawPriceDouble,
                 isFree: isFree,
                 isTrial: hasFreeTrial,
                 trialBadge: trialBadge,
                 isHidden: isHidden,
                 subtitle: subtitle,
                 isStarred: false,
-                groupName: groupName
+                groupName: groupName,
+                family: familyName,
+                offerId: detectedOfferId,
+                storeCountry: "VN",
+                productNumber: "\(productId.hashValue > 0 ? productId.hashValue : -productId.hashValue)"
             ))
         }
 
@@ -230,13 +244,18 @@ public final class StoreKitService: ObservableObject {
                             appIconSystem: item.appIconSystem,
                             title: item.title,
                             formattedPrice: item.formattedPrice,
+                            rawPrice: item.rawPrice,
                             isFree: item.isFree,
                             isTrial: item.isTrial,
                             trialBadge: item.trialBadge,
                             isHidden: item.isHidden,
                             subtitle: item.subtitle,
                             isStarred: item.isStarred,
-                            groupName: "\(trackName.uppercased()) • \(groupCount) gói"
+                            groupName: "\(trackName.uppercased()) • \(groupCount) gói",
+                            family: item.family,
+                            offerId: item.offerId,
+                            storeCountry: item.storeCountry,
+                            productNumber: item.productNumber
                         )
                     }
                     return item

@@ -30,6 +30,7 @@ public struct IAPItem: Identifiable, Hashable {
     public let appIconSystem: String
     public let title: String
     public let formattedPrice: String
+    public let rawPrice: Double
     public let isFree: Bool
     public let isTrial: Bool
     public let trialBadge: String?
@@ -37,6 +38,10 @@ public struct IAPItem: Identifiable, Hashable {
     public let subtitle: String
     public var isStarred: Bool
     public let groupName: String
+    public let family: String
+    public let offerId: String?
+    public let storeCountry: String
+    public let productNumber: String?
 
     public init(
         id: String,
@@ -45,13 +50,18 @@ public struct IAPItem: Identifiable, Hashable {
         appIconSystem: String = "play.rectangle.fill",
         title: String,
         formattedPrice: String,
+        rawPrice: Double = 0.0,
         isFree: Bool,
         isTrial: Bool,
         trialBadge: String? = nil,
         isHidden: Bool = false,
         subtitle: String,
         isStarred: Bool = false,
-        groupName: String
+        groupName: String,
+        family: String = "Pro",
+        offerId: String? = nil,
+        storeCountry: String = "VN",
+        productNumber: String? = nil
     ) {
         self.id = id
         self.appName = appName
@@ -59,6 +69,7 @@ public struct IAPItem: Identifiable, Hashable {
         self.appIconSystem = appIconSystem
         self.title = title
         self.formattedPrice = formattedPrice
+        self.rawPrice = rawPrice
         self.isFree = isFree
         self.isTrial = isTrial
         self.trialBadge = trialBadge
@@ -66,8 +77,13 @@ public struct IAPItem: Identifiable, Hashable {
         self.subtitle = subtitle
         self.isStarred = isStarred
         self.groupName = groupName
+        self.family = family
+        self.offerId = offerId
+        self.storeCountry = storeCountry
+        self.productNumber = productNumber
     }
 }
+
 
 // MARK: - Log Entry
 

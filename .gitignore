@@ -18,3 +18,7 @@ ios-app/output
 ios-app/build
 ios-tweak/packages
 ios-tweak/.theos
+*.MOV
+*.MP4
+*.mov
+*.mp4
