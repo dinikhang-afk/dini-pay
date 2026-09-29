@@ -252,17 +252,43 @@ public struct AppIAPDetailView: View {
 
                         // Product List grouped
                         if processedItems.isEmpty {
-                            VStack(spacing: 12) {
-                                Image(systemName: "tray")
-                                    .font(.system(size: 36))
-                                    .foregroundColor(.iappayTextMuted)
-                                    .padding(.top, 24)
-                                Text("Không có gói nào khớp bộ lọc")
-                                    .font(.system(size: 14, weight: .bold))
+                            VStack(spacing: 14) {
+                                Image(systemName: "antenna.radiowaves.left.and.right")
+                                    .font(.system(size: 38))
+                                    .foregroundColor(.iappayPurple)
+                                    .padding(.top, 20)
+
+                                Text("Chưa có gói IAP được lưu từ Tweak")
+                                    .font(.system(size: 16, weight: .bold))
                                     .foregroundColor(.iappayTextPrimary)
+
+                                Text("Hãy đảm bảo bạn đã cài tweak IAPCheck (.deb). Mở app này trên điện thoại và vào trang mua VIP để tweak tự động hook StoreKit và lưu danh sách gói.")
+                                    .font(.system(size: 12))
+                                    .foregroundColor(.iappayTextSecondary)
+                                    .multilineTextAlignment(.center)
+                                    .padding(.horizontal, 20)
+
+                                Button(action: {
+                                    InstalledAppsScanner.shared.launchApp(bundleId: bundleId)
+                                }) {
+                                    HStack(spacing: 6) {
+                                        Image(systemName: "arrow.up.forward.app.fill")
+                                        Text("Mở App Này Để Bắt Gói IAP")
+                                            .font(.system(size: 13, weight: .bold))
+                                    }
+                                    .foregroundColor(.white)
+                                    .padding(.horizontal, 16)
+                                    .padding(.vertical, 10)
+                                    .background(Color.iappayPurple)
+                                    .cornerRadius(12)
+                                }
+                                .padding(.top, 4)
                             }
                             .frame(maxWidth: .infinity)
-                            .padding(.vertical, 30)
+                            .padding(.vertical, 24)
+                            .background(Color.iappayCard)
+                            .cornerRadius(16)
+                            .overlay(RoundedRectangle(cornerRadius: 16).stroke(Color.iappayBorder, lineWidth: 1))
                         } else {
                             ForEach(groupedProcessedItems.keys.sorted(), id: \.self) { groupKey in
                                 VStack(alignment: .leading, spacing: 10) {

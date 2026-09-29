@@ -6,6 +6,9 @@ public struct InstalledView: View {
     @State private var selectedFilter: String = "Tất cả"
     @State private var searchText: String = ""
     @State private var showingLogs: Bool = false
+    @State private var showingAddApp: Bool = false
+    @State private var customBundleId: String = ""
+    @State private var customAppName: String = ""
     @State private var selectedItemForPurchase: IAPItem? = nil
     @State private var selectedAppForDetail: InstalledAppInfo? = nil
     @State private var selectedItemForSpec: IAPItem? = nil
@@ -13,6 +16,16 @@ public struct InstalledView: View {
     var allCount: Int { store.items.count }
     var trialCount: Int { store.items.filter { $0.isTrial }.count }
     var discountCount: Int { store.items.filter { $0.trialBadge != nil && !$0.isTrial }.count }
+
+    var filteredInstalledApps: [InstalledAppInfo] {
+        if searchText.isEmpty {
+            return scanner.installedApps
+        }
+        return scanner.installedApps.filter {
+            $0.appName.localizedCaseInsensitiveContains(searchText) ||
+            $0.bundleId.localizedCaseInsensitiveContains(searchText)
+        }
+    }
 
     var filteredItems: [IAPItem] {
         store.items.filter { item in
@@ -59,6 +72,16 @@ public struct InstalledView: View {
                                 scanner.scanApps()
                             }) {
                                 Image(systemName: "arrow.clockwise")
+                                    .font(.system(size: 14, weight: .semibold))
+                                    .foregroundColor(.iappayPurple)
+                                    .padding(8)
+                                    .background(Color.iappayCard)
+                                    .clipShape(Circle())
+                                    .overlay(Circle().stroke(Color.iappayBorder, lineWidth: 1))
+                            }
+
+                            Button(action: { showingAddApp = true }) {
+                                Image(systemName: "plus")
                                     .font(.system(size: 14, weight: .semibold))
                                     .foregroundColor(.iappayPurple)
                                     .padding(8)
@@ -145,7 +168,7 @@ public struct InstalledView: View {
                         HStack {
                             Image(systemName: "magnifyingglass")
                                 .foregroundColor(.iappayTextMuted)
-                            TextField("Tìm gói in-app purchase...", text: $searchText)
+                            TextField("Tìm gói in-app purchase, bundle ID...", text: $searchText)
                                 .foregroundColor(.iappayTextPrimary)
                         }
                         .padding(12)
@@ -157,7 +180,7 @@ public struct InstalledView: View {
                             // Section: Installed Apps to launch and capture IAP
                             VStack(alignment: .leading, spacing: 12) {
                                 HStack {
-                                    Text("ỨNG DỤNG TRÊN MÁY (\(scanner.installedApps.count))")
+                                    Text("ỨNG DỤNG TRÊN MÁY (\(filteredInstalledApps.count))")
                                         .font(.system(size: 12, weight: .bold))
                                         .foregroundColor(.iappayTextMuted)
                                     Spacer()
@@ -167,7 +190,7 @@ public struct InstalledView: View {
                                 }
                                 .padding(.top, 4)
 
-                                if scanner.installedApps.isEmpty {
+                                if filteredInstalledApps.isEmpty {
                                     VStack(spacing: 12) {
                                         Image(systemName: "app.badge.checkmark")
                                             .font(.system(size: 36))
@@ -176,16 +199,30 @@ public struct InstalledView: View {
                                         Text("Chưa phát hiện ứng dụng")
                                             .font(.system(size: 15, weight: .bold))
                                             .foregroundColor(.iappayTextPrimary)
-                                        Text("Hãy đảm bảo app chạy trên TrollStore / Jailbreak hoặc nhấn nút làm mới để quét lại danh sách ứng dụng trên máy.")
+                                        Text("Hãy đảm bảo app chạy trên TrollStore / Jailbreak hoặc nhấn nút '+' ở góc trên để thêm thủ công Bundle ID.")
                                             .font(.system(size: 12))
                                             .foregroundColor(.iappayTextSecondary)
                                             .multilineTextAlignment(.center)
                                             .padding(.horizontal, 24)
+
+                                        Button(action: { showingAddApp = true }) {
+                                            HStack(spacing: 6) {
+                                                Image(systemName: "plus.circle.fill")
+                                                Text("Thêm Bundle ID App")
+                                                    .font(.system(size: 13, weight: .bold))
+                                            }
+                                            .foregroundColor(.white)
+                                            .padding(.horizontal, 16)
+                                            .padding(.vertical, 8)
+                                            .background(Color.iappayPurple)
+                                            .cornerRadius(12)
+                                        }
+                                        .padding(.top, 4)
                                     }
                                     .frame(maxWidth: .infinity)
                                     .padding(.vertical, 24)
                                 } else {
-                                    ForEach(scanner.installedApps) { app in
+                                    ForEach(filteredInstalledApps) { app in
                                         Button(action: {
                                             selectedAppForDetail = app
                                         }) {
@@ -280,9 +317,125 @@ public struct InstalledView: View {
             .sheet(isPresented: $showingLogs) {
                 LogsView()
             }
+            .sheet(isPresented: $showingAddApp) {
+                AddCustomAppSheet(isPresented: $showingAddApp) { bundleId, name in
+                    scanner.addCustomApp(bundleId: bundleId, appName: name)
+                }
+            }
             .onAppear {
                 scanner.scanApps()
             }
+        }
+    }
+}
+
+struct AddCustomAppSheet: View {
+    @Binding var isPresented: Bool
+    let onAdd: (String, String) -> Void
+
+    @State private var bundleId: String = ""
+    @State private var appName: String = ""
+
+    private let suggestions = [
+        ("CapCut", "com.lemon.lvoverseas"),
+        ("Lightroom", "com.adobe.lightroom"),
+        ("VSCO", "com.visualsupply.vsco"),
+        ("Canva", "com.canva.canva"),
+        ("Picsart", "com.picsart.studio"),
+        ("Duolingo", "com.duolingo.DuolingoMobile")
+    ]
+
+    var body: some View {
+        ZStack {
+            Color.iappayBackground.edgesIgnoringSafeArea(.all)
+
+            VStack(spacing: 20) {
+                HStack {
+                    Text("Thêm Ứng Dụng")
+                        .font(.system(size: 18, weight: .bold))
+                        .foregroundColor(.iappayTextPrimary)
+                    Spacer()
+                    Button(action: { isPresented = false }) {
+                        Image(systemName: "xmark.circle.fill")
+                            .font(.system(size: 20))
+                            .foregroundColor(.iappayTextMuted)
+                    }
+                }
+                .padding(.top, 16)
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("BUNDLE IDENTIFIER (BẮT BUỘC)")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.iappayTextMuted)
+
+                    TextField("Ví dụ: com.lemon.lvoverseas", text: $bundleId)
+                        .autocapitalization(.none)
+                        .disableAutocorrection(true)
+                        .foregroundColor(.iappayTextPrimary)
+                        .padding(12)
+                        .background(Color.iappayCard)
+                        .cornerRadius(12)
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.iappayBorder, lineWidth: 1))
+                }
+
+                VStack(alignment: .leading, spacing: 6) {
+                    Text("TÊN ỨNG DỤNG (TÙY CHỌN)")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.iappayTextMuted)
+
+                    TextField("Ví dụ: CapCut", text: $appName)
+                        .foregroundColor(.iappayTextPrimary)
+                        .padding(12)
+                        .background(Color.iappayCard)
+                        .cornerRadius(12)
+                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.iappayBorder, lineWidth: 1))
+                }
+
+                VStack(alignment: .leading, spacing: 8) {
+                    Text("GỢI Ý ỨNG DỤNG PHỔ BIẾN:")
+                        .font(.system(size: 11, weight: .bold))
+                        .foregroundColor(.iappayTextMuted)
+
+                    ScrollView(.horizontal, showsIndicators: false) {
+                        HStack(spacing: 8) {
+                            ForEach(suggestions, id: \.1) { item in
+                                Button(action: {
+                                    appName = item.0
+                                    bundleId = item.1
+                                }) {
+                                    Text(item.0)
+                                        .font(.system(size: 12, weight: .semibold))
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 12)
+                                        .padding(.vertical, 6)
+                                        .background(Color.iappayCard)
+                                        .cornerRadius(12)
+                                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.iappayBorder, lineWidth: 1))
+                                }
+                            }
+                        }
+                    }
+                }
+
+                Spacer()
+
+                Button(action: {
+                    guard !bundleId.trimmingCharacters(in: .whitespaces).isEmpty else { return }
+                    onAdd(bundleId, appName)
+                    isPresented = false
+                }) {
+                    Text("Thêm Vào Danh Sách")
+                        .font(.system(size: 15, weight: .bold))
+                        .foregroundColor(.white)
+                        .frame(maxWidth: .infinity)
+                        .padding(.vertical, 14)
+                        .background(bundleId.isEmpty ? Color.iappayPurple.opacity(0.4) : Color.iappayPurple)
+                        .cornerRadius(14)
+                }
+                .disabled(bundleId.isEmpty)
+                .padding(.bottom, 16)
+            }
+            .padding(.horizontal, 16)
         }
     }
 }
