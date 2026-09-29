@@ -7,31 +7,11 @@ on:
 
 jobs:
   build:
-    runs-on: macos-14
+    runs-on: ubuntu-latest
 
     steps:
       - name: Checkout repository
         uses: actions/checkout@v4
 
-      - name: Setup Xcode
-        uses: maxim-lobanov/setup-xcode@v1
-        with:
-          xcode-version: '15.4'
-
-      - name: Install ldid
-        run: |
-          brew install ldid
-
-      - name: Build Dini Pay IPA & TIPA
-        run: |
-          cd ios-app
-          chmod +x build_ipa.sh
-          ./build_ipa.sh
-
-      - name: Upload IPA Artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: DiniPay-IPA
-          path: |
-            ios-app/output/DiniPay.ipa
-            ios-app/output/DiniPay.tipa
+      - name: Test runner
+        run: echo "Runner is working!"
