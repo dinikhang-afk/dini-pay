@@ -33,6 +33,7 @@ public struct AppIAPDetailView: View {
     @State private var selectedItemForPurchase: IAPItem? = nil
     @State private var selectedItemForSpec: IAPItem? = nil
     @State private var showingLogs: Bool = false
+    @State private var showingAddPackageSheet: Bool = false
 
     var appItems: [IAPItem] {
         let current = store.items.filter { $0.appBundleId == bundleId }
@@ -122,6 +123,16 @@ public struct AppIAPDetailView: View {
                     }
 
                     Spacer()
+
+                    Button(action: { showingAddPackageSheet = true }) {
+                        Image(systemName: "plus")
+                            .font(.system(size: 13, weight: .bold))
+                            .foregroundColor(.iappayPurple)
+                            .padding(7)
+                            .background(Color.iappayCard)
+                            .clipShape(Circle())
+                            .overlay(Circle().stroke(Color.iappayBorder, lineWidth: 1))
+                    }
 
                     Button(action: { showingLogs = true }) {
                         HStack(spacing: 4) {
@@ -268,19 +279,37 @@ public struct AppIAPDetailView: View {
                                     .multilineTextAlignment(.center)
                                     .padding(.horizontal, 20)
 
-                                Button(action: {
-                                    InstalledAppsScanner.shared.launchApp(bundleId: bundleId)
-                                }) {
-                                    HStack(spacing: 6) {
-                                        Image(systemName: "arrow.up.forward.app.fill")
-                                        Text("Mở App Này Để Bắt Gói IAP")
-                                            .font(.system(size: 13, weight: .bold))
+                                HStack(spacing: 10) {
+                                    Button(action: {
+                                        InstalledAppsScanner.shared.launchApp(bundleId: bundleId)
+                                    }) {
+                                        HStack(spacing: 6) {
+                                            Image(systemName: "arrow.up.forward.app.fill")
+                                            Text("Mở App")
+                                                .font(.system(size: 13, weight: .bold))
+                                        }
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                        .background(Color.iappayPurple)
+                                        .cornerRadius(12)
                                     }
-                                    .foregroundColor(.white)
-                                    .padding(.horizontal, 16)
-                                    .padding(.vertical, 10)
-                                    .background(Color.iappayPurple)
-                                    .cornerRadius(12)
+
+                                    Button(action: {
+                                        showingAddPackageSheet = true
+                                    }) {
+                                        HStack(spacing: 6) {
+                                            Image(systemName: "plus.circle.fill")
+                                            Text("Nhập Product ID")
+                                                .font(.system(size: 13, weight: .bold))
+                                        }
+                                        .foregroundColor(.white)
+                                        .padding(.horizontal, 14)
+                                        .padding(.vertical, 10)
+                                        .background(Color.iappayCard)
+                                        .cornerRadius(12)
+                                        .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.iappayPurple, lineWidth: 1))
+                                    }
                                 }
                                 .padding(.top, 4)
                             }
@@ -330,6 +359,158 @@ public struct AppIAPDetailView: View {
         }
         .sheet(isPresented: $showingLogs) {
             LogsView()
+        }
+        .sheet(isPresented: $showingAddPackageSheet) {
+            AddPackageSheet(bundleId: bundleId, appName: appName, isPresented: $showingAddPackageSheet) { newItem in
+                store.addCustomItem(newItem)
+            }
+        }
+    }
+}
+
+struct AddPackageSheet: View {
+    let bundleId: String
+    let appName: String
+    @Binding var isPresented: Bool
+    let onAdd: (IAPItem) -> Void
+
+    @State private var productId: String = ""
+    @State private var title: String = ""
+    @State private var priceFormatted: String = "Miễn phí"
+    @State private var isTrial: Bool = true
+    @State private var trialDuration: String = "DÙNG THỬ 1 THÁNG"
+    @State private var isHiddenOffer: Bool = true
+    @State private var offerId: String = ""
+
+    var body: some View {
+        ZStack {
+            Color.iappayBackground.edgesIgnoringSafeArea(.all)
+
+            ScrollView {
+                VStack(spacing: 16) {
+                    HStack {
+                        Text("Nhập Gói IAP Cho \(appName)")
+                            .font(.system(size: 17, weight: .bold))
+                            .foregroundColor(.iappayTextPrimary)
+                        Spacer()
+                        Button(action: { isPresented = false }) {
+                            Image(systemName: "xmark.circle.fill")
+                                .font(.system(size: 20))
+                                .foregroundColor(.iappayTextMuted)
+                        }
+                    }
+                    .padding(.top, 16)
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("PRODUCT IDENTIFIER (BẮT BUỘC)")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.iappayTextMuted)
+                        TextField("Ví dụ: \(bundleId).premium_1month", text: $productId)
+                            .autocapitalization(.none)
+                            .disableAutocorrection(true)
+                            .foregroundColor(.iappayTextPrimary)
+                            .padding(12)
+                            .background(Color.iappayCard)
+                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.iappayBorder, lineWidth: 1))
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("TÊN GÓI")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.iappayTextMuted)
+                        TextField("Ví dụ: VIP Premium (1 Tháng)", text: $title)
+                            .foregroundColor(.iappayTextPrimary)
+                            .padding(12)
+                            .background(Color.iappayCard)
+                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.iappayBorder, lineWidth: 1))
+                    }
+
+                    VStack(alignment: .leading, spacing: 6) {
+                        Text("GIÁ HIỂN THỊ")
+                            .font(.system(size: 11, weight: .bold))
+                            .foregroundColor(.iappayTextMuted)
+                        TextField("Ví dụ: Miễn phí hoặc 79.000 đ", text: $priceFormatted)
+                            .foregroundColor(.iappayTextPrimary)
+                            .padding(12)
+                            .background(Color.iappayCard)
+                            .cornerRadius(12)
+                            .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.iappayBorder, lineWidth: 1))
+                    }
+
+                    Toggle("Là gói dùng thử (Free Trial)", isOn: $isTrial)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.iappayTextPrimary)
+                        .padding(12)
+                        .background(Color.iappayCard)
+                        .cornerRadius(12)
+
+                    Toggle("Là gói khuyến mãi ẩn (Hidden Offer)", isOn: $isHiddenOffer)
+                        .font(.system(size: 13, weight: .semibold))
+                        .foregroundColor(.iappayTextPrimary)
+                        .padding(12)
+                        .background(Color.iappayCard)
+                        .cornerRadius(12)
+
+                    if isHiddenOffer {
+                        VStack(alignment: .leading, spacing: 6) {
+                            Text("OFFER IDENTIFIER (NẾU CÓ)")
+                                .font(.system(size: 11, weight: .bold))
+                                .foregroundColor(.iappayTextMuted)
+                            TextField("Ví dụ: promo_trial_special", text: $offerId)
+                                .autocapitalization(.none)
+                                .disableAutocorrection(true)
+                                .foregroundColor(.iappayTextPrimary)
+                                .padding(12)
+                                .background(Color.iappayCard)
+                                .cornerRadius(12)
+                                .overlay(RoundedRectangle(cornerRadius: 12).stroke(Color.iappayBorder, lineWidth: 1))
+                        }
+                    }
+
+                    Button(action: {
+                        let trimmed = productId.trimmingCharacters(in: .whitespaces)
+                        guard !trimmed.isEmpty else { return }
+                        let finalTitle = title.trimmingCharacters(in: .whitespaces).isEmpty ? trimmed : title
+                        let isFree = priceFormatted.lowercased().contains("miễn phí") || priceFormatted == "0"
+                        let item = IAPItem(
+                            id: trimmed,
+                            appName: appName,
+                            appBundleId: bundleId,
+                            appIconSystem: "app.fill",
+                            title: finalTitle,
+                            formattedPrice: priceFormatted,
+                            rawPrice: 0,
+                            isFree: isFree,
+                            isTrial: isTrial,
+                            trialBadge: isTrial ? "DÙNG THỬ" : nil,
+                            isHidden: isHiddenOffer,
+                            subtitle: isTrial ? "Dùng thử miễn phí" : priceFormatted,
+                            isStarred: false,
+                            groupName: "\(appName.uppercased()) • TÙY CHỌN",
+                            family: "Custom",
+                            offerId: offerId.isEmpty ? nil : offerId,
+                            storeCountry: "VN",
+                            productNumber: "\(trimmed.hashValue > 0 ? trimmed.hashValue : -trimmed.hashValue)"
+                        )
+                        onAdd(item)
+                        isPresented = false
+                    }) {
+                        Text("Lưu Gói & Hiển Thị")
+                            .font(.system(size: 15, weight: .bold))
+                            .foregroundColor(.white)
+                            .frame(maxWidth: .infinity)
+                            .padding(.vertical, 14)
+                            .background(productId.isEmpty ? Color.iappayPurple.opacity(0.4) : Color.iappayPurple)
+                            .cornerRadius(14)
+                    }
+                    .disabled(productId.isEmpty)
+                    .padding(.top, 8)
+                    .padding(.bottom, 24)
+                }
+                .padding(.horizontal, 16)
+            }
         }
     }
 }
