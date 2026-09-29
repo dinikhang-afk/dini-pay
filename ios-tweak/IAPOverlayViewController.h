@@ -4,9 +4,9 @@
 NS_ASSUME_NONNULL_BEGIN
 
 @interface IAPOverlayViewController : UIViewController <UITableViewDataSource, UITableViewDelegate>
-+ (void)showInWindow:(UIWindow *)window;
-+ (void)toggle;
 + (void)setupFloatingButton;
++ (void)toggle;
++ (void)showInWindow:(nullable UIWindow *)window;
 @end
 
 NS_ASSUME_NONNULL_END

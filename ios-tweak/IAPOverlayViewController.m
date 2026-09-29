@@ -14,6 +14,17 @@ static UIWindow *gModalWindow = nil;
 
 @implementation IAPOverlayViewController
 
++ (void)showInWindow:(UIWindow *)window {
+    [self setupFloatingButton];
+}
+
++ (void)toggle {
+    // Toggle overlay window if present
+    if (gModalWindow) {
+        gModalWindow.hidden = !gModalWindow.hidden;
+    }
+}
+
 + (void)setupFloatingButton {
     dispatch_async(dispatch_get_main_queue(), ^{
         if (gFloatingWindow) return;

@@ -9,7 +9,7 @@ include $(THEOS)/makefiles/common.mk
 TWEAK_NAME = IAPCheck
 
 IAPCheck_FILES = Tweak.x IAPProductModel.m IAPOverlayViewController.m
-IAPCheck_CFLAGS = -fobjc-arc -Wno-deprecated-declarations
+IAPCheck_CFLAGS = -fobjc-arc -Wno-deprecated-declarations -Wno-incomplete-implementation -Wno-unused-variable
 IAPCheck_FRAMEWORKS = UIKit StoreKit Foundation CoreGraphics
 
 include $(THEOS_MAKE_PATH)/tweak.mk
